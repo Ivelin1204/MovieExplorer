@@ -50,7 +50,7 @@ npm install
 npm run dev
 ```
 
-Open the URL Vite prints (usually http://localhost:5173).
+Open **http://localhost:5183** (the client is pinned to this port in `vite.config.js` so it won't shift if another project is already using 5173).
 
 ## Features
 
@@ -58,3 +58,24 @@ Open the URL Vite prints (usually http://localhost:5173).
 - **Details** — overview, rating, runtime, genres, director, and top cast.
 - **Trailer** — embedded YouTube player using TMDB's linked trailer (or a YouTube search fallback).
 - **Trivia** — auto-generated multiple-choice questions about the movie (release year, director, genre, cast) based on its own data — no extra API calls needed.
+
+## Deploying
+
+GitHub Pages only serves static files, so the client and server deploy to two different places.
+
+### 1. Deploy the server to Render
+
+1. Sign up at https://render.com and click **New > Web Service**, connecting this GitHub repo. Render will detect `render.yaml` in the repo root and pre-fill the service (root dir `server`, build `npm install`, start `npm start`).
+2. In the service's **Environment** tab, add `TMDB_API_KEY` and `YOUTUBE_API_KEY` with your real keys (these aren't stored in the repo).
+3. Deploy, then copy the service's public URL (something like `https://movie-explorer-server.onrender.com`).
+
+Render's free tier spins the service down when idle, so the first request after inactivity can take ~30s to respond.
+
+### 2. Deploy the client to GitHub Pages
+
+1. In the GitHub repo, go to **Settings > Pages** and set **Source** to **GitHub Actions**.
+2. Go to **Settings > Secrets and variables > Actions > Variables** and add a repository variable named `VITE_API_BASE_URL` set to `<your Render URL>/api` (e.g. `https://movie-explorer-server.onrender.com/api`).
+3. Push to `main` — the `.github/workflows/deploy-pages.yml` workflow builds `client/` with that URL baked in and publishes it to GitHub Pages automatically.
+4. The site will be live at `https://<your-username>.github.io/MovieExplorer/`.
+
+The client uses `HashRouter` (URLs like `/#/movie/603`) specifically so it works on GitHub Pages without server-side routing support.

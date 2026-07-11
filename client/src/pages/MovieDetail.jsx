@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Trailer from '../components/Trailer';
 import Trivia from '../components/Trivia';
 import { getMovieDetails } from '../api';
 
 export default function MovieDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState(null);
+
+  function goBack() {
+    if (window.history.length > 2) navigate(-1);
+    else navigate('/');
+  }
 
   useEffect(() => {
     setStatus('loading');
@@ -28,7 +34,7 @@ export default function MovieDetail() {
 
   return (
     <div className="page">
-      <Link to="/" className="back-link">&larr; Back to search</Link>
+      <button type="button" onClick={goBack} className="back-link">&larr; Back to search</button>
 
       <div
         className="movie-detail__hero"
